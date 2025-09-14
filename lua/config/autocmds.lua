@@ -20,16 +20,16 @@ local function format_buffer()
   if not _G.format_on_idle_enabled then
     return
   end
-  
+
   local buf = vim.api.nvim_get_current_buf()
   local filetype = vim.api.nvim_buf_get_option(buf, "filetype")
-  
+
   -- Only format specific file types
   local supported_filetypes = {
     "cs", "javascript", "typescript", "lua", "python", "go", "rust",
     "c", "cpp", "java", "json", "yaml", "html", "css", "scss", "markdown"
   }
-  
+
   local should_format = false
   for _, ft in ipairs(supported_filetypes) do
     if filetype == ft then
@@ -37,7 +37,7 @@ local function format_buffer()
       break
     end
   end
-  
+
   if should_format and vim.api.nvim_buf_get_option(buf, "modified") then
     -- Try LSP formatting first, then fall back to conform.nvim
     local clients = vim.lsp.buf_get_clients(buf)
@@ -55,7 +55,7 @@ local function reset_format_timer()
     format_timer:stop()
     format_timer:close()
   end
-  
+
   if _G.format_on_idle_enabled then
     format_timer = vim.loop.new_timer()
     format_timer:start(format_delay, 0, vim.schedule_wrap(format_buffer))
@@ -65,7 +65,7 @@ end
 -- Function to toggle format on idle
 _G.toggle_format_on_idle = function()
   _G.format_on_idle_enabled = not _G.format_on_idle_enabled
-  
+
   if _G.format_on_idle_enabled then
     vim.notify("Format on Idle: ENABLED", vim.log.levels.INFO)
     reset_format_timer()
